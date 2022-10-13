@@ -165,9 +165,6 @@ ax1.set_ylabel("y (m)")
 ax1.set_title("Gráfico da Posição da Bola no campo")
 ax1.grid()
 
-plt.grid()
-plt.show()
-
 #===================================================
 #--------- Gráfico da posição x e y do robô --------
 #-------- em relação ao tempo de interceptação -----

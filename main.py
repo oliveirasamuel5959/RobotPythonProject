@@ -168,6 +168,10 @@ ax1.grid()
 plt.grid()
 plt.show()
 
+#===================================================
+#--------- Gráfico da posição x e y do robô --------
+#-------- em relação ao tempo de interceptação -----
+#===================================================
 
 fig2, ax2 = plt.subplots()
 

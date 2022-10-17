@@ -17,6 +17,8 @@ vy = 1
 data_x = []
 data_y = []
 data_t = []
+data_velx = []
+data_vely = []
 
 velx = 0
 vely = 0
@@ -47,10 +49,15 @@ def intersectionPoint(time, xo, yo, x, y):
 
         t = t + dt
         data_t.append(t)
+
+        data_velx.append(velx)
+        data_vely.append(vely)
     
     getData.append(data_x)
     getData.append(data_y)
     getData.append(data_t)
+    getData.append(data_velx)
+    getData.append(data_vely)
 
     return getData
 

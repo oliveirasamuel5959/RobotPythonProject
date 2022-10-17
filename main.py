@@ -4,6 +4,7 @@ from xmlrpc.server import resolve_dotted_attribute
 import numpy as np
 import matplotlib.pyplot as plt
 from intercept import intersectionPoint
+from variables import *
 
 '''
 ==================================
@@ -33,6 +34,10 @@ leitura do arquivo de texto com as dados de tempo
 time = []
 x_pos = []
 y_pos = []
+
+ball_yvel = []
+ball_xvel = []
+
 data = np.loadtxt(fname = 'time.txt')
 for i in data:
     time.append(i)
@@ -47,7 +52,10 @@ for i in range(len(time)):
     #x(t) = -0.007t³ - 0.17t² + 2.5t + 1
 
     x = -0.007*time[i]**3 - 0.17*time[i]**2 + 2.5*time[i] + 1
+    x_vel = -0.021*time[i]**2 - 0.34*time[i] + 2.5
+
     x_pos.append(x)
+    ball_xvel.append(x_vel)
 
 '''
 *
@@ -59,7 +67,12 @@ for i in range(len(time)):
     #y(t) = -0.2t² + 1.8t + 0.7
 
     y = -0.2*time[i]**2 + 1.8*time[i] + 0.7
+    y_vel = -0.2*time[i] + 1.8
+
     y_pos.append(y)
+    ball_yvel.append(y_vel)
+
+    
 
 
 '''
@@ -115,7 +128,7 @@ for i in range(len(time)):
         
 
 
-data_pos = []
+robot_data = []
 
 def min_distance():
 
@@ -139,58 +152,85 @@ def min_distance():
 
 min_distance()
 
-data_pos = intersectionPoint(new_time, xo, yo, ballx_pos, bally_pos)
+robot_data = intersectionPoint(new_time, xo, yo, ballx_pos, bally_pos)
 
-print(data_pos[2])
 
 
 #===================================================
 #--------- Gráfico da Trajetória da bola------------
 #-------- e Posição de interceptação do Robô -------
 #===================================================
-fig1, ax1 = plt.subplots()
+fig, axs = plt.subplots(nrows=2, ncols=2)
 
-ax1.plot(xo, yo, color='none', linestyle = 'dashed', linewidth = 2,
+axs[0][0].plot(xo, yo, color='none', linestyle = 'dashed', linewidth = 2,
 marker = 'o', markersize = 6, markerfacecolor = 'blue', markeredgecolor = 'blue')
+axs[0][0].plot(robot_data[0], robot_data[1], label='Bola (x,y) pos', color='blue', linewidth = 0.75)
+axs[0][0].plot(x_pos, y_pos, label='Bola (x,y) pos', color='orange')
 
-ax1.plot(data_pos[0], data_pos[1], label='Bola (x,y) pos', color='blue', linewidth = 0.75)
-ax1.plot(x_pos, y_pos, label='Bola (x,y) pos', color='orange')
 
-
-ax1.legend(loc="upper left", shadow=True, fontsize="small")
-ax1.set_xlim(0,9)
-ax1.set_ylim(0,6)
-ax1.set_xlabel("x (m)")
-ax1.set_ylabel("y (m)")
-ax1.set_title("Gráfico da Posição da Bola no campo")
-ax1.grid()
+axs[0][0].legend(loc="upper left", shadow=True, fontsize="small")
+axs[0][0].set_xlim(0,9)
+axs[0][0].set_ylim(0,6)
+axs[0][0].set_xlabel("x (m)")
+axs[0][0].set_ylabel("y (m)")
+axs[0][0].set_title("Gráfico da trajetória da bola\n e do robô até a interceptção")
+axs[0][0].grid()
+plt.grid()
 
 #===================================================
 #--------- Gráfico da posição x e y do robô --------
 #-------- em relação ao tempo de interceptação -----
 #===================================================
+axs[1][0].plot(robot_data[robot_time], robot_data[robot_xpos], label='posição x do robô')
+axs[1][0].plot(robot_data[robot_time], robot_data[robot_ypos], label='posição y do robô')
 
-fig2, ax2 = plt.subplots()
+axs[1][0].legend(loc="upper left", shadow=True, fontsize="small")
+axs[1][0].legend(loc="upper left", shadow=True, fontsize="small")
+axs[1][0].set_xlim(0,new_time)
+axs[1][0].set_ylim(0, 9)
+axs[1][0].set_xlabel("temp t (s)")
+axs[1][0].set_ylabel("posição em x (m)")
+axs[1][0].set_title("Gráfico x e y da posição\n do robô em função do tempo")
+axs[1][0].grid()
+plt.grid()
 
-ax2.plot(data_pos[2], data_pos[0], label='posição x do robô')
-ax2.plot(data_pos[2], data_pos[1], label='posição y do robô')
+
+#===================================================
+#--------- Gráfico da velocidade x e y do robô --------
+#-------- em relação ao tempo de interceptação -----
+#===================================================
+axs[0][1].plot(robot_data[robot_time], robot_data[robot_xvel])
+axs[0][1].plot(robot_data[robot_time], robot_data[robot_yvel])
+
+axs[0][1].legend(loc="upper left", shadow=True, fontsize="small")
+axs[0][1].set_xlim(0,new_time)
+axs[0][1].set_ylim(-2, 2)
+axs[0][1].set_xlabel("temp t (s)")
+axs[0][1].set_ylabel("posição em x (m)")
+axs[0][1].set_title("Gráfico x e y da posição\n do robô em função do tempo")
+axs[0][1].grid()
+plt.grid()
 
 
-ax2.legend(loc="upper left", shadow=True, fontsize="small")
-ax2.set_xlim(0,new_time)
-ax2.set_ylim(0, 9)
-ax2.set_xlabel("temp t (s)")
-ax2.set_ylabel("posição em x (m)")
-ax2.set_title("Gráfico da Posição da Bola no campo")
-ax2.grid()
+#===================================================
+#--------- Gráfico da velocidade x e y do robô --------
+#-------- em relação ao tempo de interceptação -----
+#===================================================
+axs[1][1].plot(time, ball_xvel)
+axs[1][1].plot(time, ball_yvel)
 
+axs[1][1].legend(loc="upper left", shadow=True, fontsize="small")
+axs[1][1].set_xlabel("temp t (s)")
+axs[1][1].set_ylabel("posição em x (m)")
+axs[1][1].set_title("Gráfico da velocidade x\n da bola em função do tempo")
+axs[1][1].grid()
+plt.grid()
 
 plt.tight_layout()
-
-plt.grid()
 plt.show()
 
-#fig1.savefig('fig1.png')'''
+
+#fig1.savefig('fig1.png')
 
 
 

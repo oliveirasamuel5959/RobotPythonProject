@@ -9,6 +9,7 @@ robot_ypos = 1
 robot_time = 2
 robot_xvel = 3
 robot_yvel = 4
+vel_absolute = 5
 
 
 time = [] # Tempo de trjetória da bola no campo [0, 20s]
@@ -25,6 +26,5 @@ relativeDist = [] # lista com as posições relativas entre a bola e o robô em 
 min_dist = 0 # menor distância relativa entre a bola e o robô
 
 
-vxmax_robot = 2.10 # velocidade máxima do robô em x
-vymax_robot = 0.3 # velocidade máxima do robô em y
+vmax_robot = 2.5 # velocidade máxima do robô em y
 raio_bolaRobo = 0.03 # raio de interceptação

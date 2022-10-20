@@ -1,8 +1,9 @@
 '''
-*****************************************
-WELCOME TO PYTHON CLASSES AND INHERITANCE
-COURSE FROM MICHIGAN UNIVERSITY
-*****************************************
+*********************************************
+Modulo do programa que calcula as Equações do
+movimento robô para retornar uma lista com
+todas as veriaveis 
+*********************************************
 '''
 from ast import Global
 from cmath import sqrt
@@ -23,6 +24,7 @@ data_vely = []
 
 velx = 0
 vely = 0
+vel_mag = 0
 
 getData = []
 
@@ -33,17 +35,19 @@ def intersectionPoint(time, xo, yo, x, y):
     global t
     t = 0
 
-    if xo < 4.5 and yo > 3: # Bola no segundo quadrante
-        time = time - (time * 0.10)
+    if (xo < 4.5 and yo > 3) or xo <= 2 and yo <= 3: # Bola no segundo quadrante
+        time = time - (time * 0.20)
     else:
-        time = time - (time * 0.5)
+        time = time - (time * 0.40)
 
     velx = (x - xo) / time
     vely = (y - yo) / time
 
+    vel_mag = pow(velx, 2) + pow(vely, 2)
+    vel_mag = pow(vel_mag, 1/2)
+
     while time > t:
 
-        #calculo feito para x0 = 3 e y0 = 6
         x = xo + velx * t
         data_x.append(x)
 
@@ -61,6 +65,7 @@ def intersectionPoint(time, xo, yo, x, y):
     getData.append(data_t)
     getData.append(data_velx)
     getData.append(data_vely)
+    getData.append(vel_mag)
 
     return getData
 

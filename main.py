@@ -3,7 +3,6 @@ from glob import glob
 from operator import ne
 from tkinter import font
 from turtle import color
-from xmlrpc.server import resolve_dotted_attribute
 import numpy as np
 import matplotlib.pyplot as plt
 from intercept import intersectionPoint
@@ -28,6 +27,7 @@ from variables import *
 
 
 data = np.loadtxt(fname = 'time.txt')
+
 for i in data:
     time.append(i)
 
@@ -84,7 +84,6 @@ class Coordinate(object):
 xo = float(input("Digite o valor inicial xo entre 0 e 9: "))
 yo = float(input("Digite o valor inicial yo entre 0 e 6: "))
 
-
 #================================================
 #----- chamada da classe para o calculo da ------
 #----- posição relativa entre robô e bola -------
@@ -102,20 +101,20 @@ robot_data = []
 #----- minima da posição relativa encontrada ----
 #================================================
 def min_distance():
-
     global new_time
     global ballx_pos
     global bally_pos
 
-    min = relativeDist[0]
+    min_dist = relativeDist[0]
     for i in range(len(relativeDist)):
-        if(relativeDist[i] < min):
-            min = relativeDist[i] # menor distância minima no ponto dado
+        if(relativeDist[i] < min_dist):
+            min_dist = relativeDist[i] # menor distância minima no ponto dado
             ballx_pos = x_pos[i] # posição da bola em x no ponto distância minima
             bally_pos = y_pos[i] # posição da bola em y no ponto distância minima 
             new_time = time[i] # Tempo até a bola chegar ao ponto distância minima
         
-    print("Min value is {:.2f} in time {:.2f} at bola = ({:.2f}, {:.2f})"  .format( min, new_time, ballx_pos, bally_pos))
+    print("Min value is {:.2f} in time {:.2f} at bola = ({:.2f}, {:.2f})" .format(min_dist, new_time, ballx_pos, bally_pos))
+
 
 min_distance()
 
@@ -147,10 +146,11 @@ def gotBall():
 
 
 print(robot_data[vel_absolute])
+print(gotBall())
 
 
 font_dict = {'family': 'serif',
-             'color': 'darkred',
+             'color': 'darkblue',
              'size': 10}
 
 #===================================================
@@ -168,18 +168,19 @@ ax.plot(x_pos[0], y_pos[0], color='none', linestyle = 'dashed', linewidth = 2,
 marker = 's', markersize = 6, markerfacecolor = 'red', markeredgecolor = 'red')
 
 ax.plot(robot_data[robot_xpos], robot_data[robot_ypos], label='Trajetória do robô', color='blue', linewidth = 0.75)
-ax.plot(x_pos, y_pos, label='Trajetória da bola', color='orange')
+ax.plot(x_pos, y_pos, label='Trajetória da bola', color='c')
 
 ax.legend(loc="upper left", shadow=True, fontsize=14, ncol=2, facecolor="lightgray")
 ax.set_xlim(-1,9)
 ax.set_ylim(0,7)
-ax.set_xlabel(r'$x$')
-ax.set_ylabel(r'$y$')
-ax.set_title("Gráfico da trajetória da bola\n e do robô até o ponto de interceptção")
-ax.text(xo, yo + 0.25, "robot", ha='center')
+ax.set_xlabel(r'$x[m]$')
+ax.set_ylabel(r'$y[m]$')
+ax.set_title("Gráfico da trajetória da bola\n e do robô até o ponto de interceptção", fontsize=16, fontweight='bold')
+ax.text(xo, yo + 0.25, "robot", ha='center', fontweight='bold')
 ax.text(xo, yo - 0.25, f"({xo}, {yo})", ha='center') # posição do robô no gráfico (xo, yo)
-ax.text(x_pos[0], y_pos[0] + 0.25, "bola", ha='center')
+ax.text(x_pos[0], y_pos[0] + 0.25, "bola", ha='center', fontweight='bold')
 ax.text(x_pos[0], y_pos[0] - 0.25, f"({x_pos[0]}, {y_pos[0]})", ha='center')
+
 
 
 if xo < 4.5 and yo > 3: # Bola no segundo quadrante
@@ -187,19 +188,28 @@ if xo < 4.5 and yo > 3: # Bola no segundo quadrante
     ax.text(5.5, 6.5, f" {r'$t_r$'} = {robot_data[robot_time][-1]:.2f}{r'$s$'} ", ha='left', fontdict=font_dict)
     ax.text(6.5, 6.5, f" {r'$x(t_b)$'} = {7.26:.2f}{r'$m$'} ", ha='left', fontdict=font_dict)
     ax.text(7.8, 6.5, f" {r'$y(t_b)$'} = {4.50:.2f}{r'$m$'} ", ha='left', fontdict=font_dict)
+    ax.text(6, 6.15, f" {r'$|v_r|$'} = {robot_data[vel_absolute]:.2f}{r'$m/s$'} ", ha='left', fontdict=font_dict)
 
     ax.annotate('Interceptação', (7.26, 4.50),
             xytext=(0.8, 0.8), textcoords='axes fraction', 
             arrowprops=dict(arrowstyle="->", facecolor='red'))
+
+    if robot_data[vel_absolute] < vmax_robot and gotBall():
+        ax.text(1, 3.5, f"Bola interceptada na posição: ({7.26 - 0.215:.2f}, {4.50 - 0.215:.2f})", ha='center', fontsize=13, color="black")
 else:
     ax.text(4.5, 6.5, f" {r'$t_b$'} = {new_time:.2f}{r'$s$'} ", ha='left', fontdict=font_dict)
     ax.text(5.5, 6.5, f" {r'$t_r$'} = {robot_data[robot_time][-1]:.2f}{r'$s$'} ", ha='left', fontdict=font_dict)
     ax.text(6.5, 6.5, f" {r'$x(t_b)$'} = {ballx_pos:.2f}{r'$m$'} ", ha='left', fontdict=font_dict)
     ax.text(7.8, 6.5, f" {r'$y(t_b)$'} = {bally_pos:.2f}{r'$m$'} ", ha='left', fontdict=font_dict)
+    ax.text(6, 6.15, f" {r'$|v_r|$'} = {robot_data[vel_absolute]:.2f}{r'$m/s$'} ", ha='left', fontdict=font_dict)
 
     ax.annotate('Interceptação', (ballx_pos, bally_pos),
             xytext=(0.8, 0.8), textcoords='axes fraction', 
             arrowprops=dict(arrowstyle="->", facecolor='red', color='red'))
+    
+    if robot_data[vel_absolute] < vmax_robot and gotBall():
+        ax.text(1, 3.5, f"Bola interceptada na posição: ({ballx_pos - 0.215:.2f}, {bally_pos - 0.215:.2f})", ha='center', fontsize=13, color="black")
+
 
 if robot_data[vel_absolute] > vmax_robot:
     ax.text(4.5, 3.5, f"Velocidade máxima ultrapassada: {r'$v_m$'} = {robot_data[vel_absolute]:.2f}{r'$m/s$'}", ha='center', fontsize=16, color="red")
@@ -209,20 +219,22 @@ ax.grid(b=True, which="minor")
 
 
 
-fig2, axs = plt.subplots(nrows=2, ncols=2)
+fig2, axs = plt.subplots(nrows=2, ncols=2, layout="constrained")
 #===================================================
 #--------- Gráfico da posição x e y do robô --------
 #-------- em relação ao tempo de interceptação -----
 #===================================================
-axs[0][0].plot(robot_data[robot_time], robot_data[robot_xpos], label=r'$x_r(t)$')
-axs[0][0].plot(robot_data[robot_time], robot_data[robot_ypos], label=r'$y_r(t)$')
+axs[0][0].plot(robot_data[robot_time], robot_data[robot_xpos], label=r'$x_r(t)$', color='m')
+axs[0][0].plot(robot_data[robot_time], robot_data[robot_ypos], label=r'$y_r(t)$', color='c')
 
-axs[0][0].legend(loc="upper right", shadow=True, fontsize=14, bbox_to_anchor=(-0.05, 1.5))
+axs[0][0].legend(loc="upper right", shadow=True, fontsize=10, bbox_to_anchor=(-0.05, 1.5))
 axs[0][0].set_xlim(0, robot_data[robot_time][-1] + 0.25)
 axs[0][0].set_ylim(0, 9)
 axs[0][0].set_xlabel(r'$t[s]$')
-axs[0][0].set_ylabel(r'$x[m]$')
-axs[0][0].set_title("Gráfico x e y da posição\n do robô em função do tempo")
+axs[0][0].set_ylabel(r'$s[m]$')
+axs[0][0].xaxis.set_ticks(np.arange(0, 2, 0.25))
+axs[0][0].yaxis.set_ticks(np.arange(0, 9, 1.0))
+axs[0][0].set_title("Gráfico da posição x e y\n do robô em função do tempo de interceptação", fontweight='bold')
 axs[0][0].minorticks_on()
 axs[0][0].grid(b=True, which="minor")
 
@@ -230,17 +242,17 @@ axs[0][0].grid(b=True, which="minor")
 #--------- Gráfico da velocidade x e y do robô --------
 #-------- em relação ao tempo de interceptação -----
 #===================================================
-axs[0][1].plot(robot_data[robot_time], robot_data[robot_xvel], label=r'$v_r(x)$')
-axs[0][1].plot(robot_data[robot_time], robot_data[robot_yvel], label=r'$v_r(y)$')
+axs[0][1].plot(robot_data[robot_time], robot_data[robot_xvel], label=f" {r'$v_r(x)$'} = {robot_data[robot_xvel][-1]:.2f}{r'$m/s$'}", color='m')
+axs[0][1].plot(robot_data[robot_time], robot_data[robot_yvel], label=f" {r'$v_r(y)$'} = {robot_data[robot_yvel][-1]:.2f}{r'$m/s$'}", color='c')
 
-axs[0][1].legend(loc="upper left", shadow=True, fontsize=12, bbox_to_anchor=(1.00, 1.5))
+axs[0][1].legend(loc="upper left", shadow=True, fontsize=10, bbox_to_anchor=(1.00, 1.5))
 axs[0][1].set_xlim(0, robot_data[robot_time][-1] + 0.25)
 axs[0][1].set_ylim(-4, 4)
 axs[0][1].set_xlabel(r'$t[s]$')
+axs[0][1].xaxis.set_ticks(np.arange(0, 2, 0.25))
+axs[0][1].yaxis.set_ticks(np.arange(-4, 4, 0.75))
 axs[0][1].set_ylabel(r'$v[m/s]$')
-axs[0][1].set_title("Gráfico da velocidade x e y\n do robô em função do tempo")
-axs[0][1].text(robot_data[robot_time][-1] - 0.2*robot_data[robot_time][-1], 3, f" {r'$v_r(x)$'} = {robot_data[robot_xvel][0]:.2f}{r'$m/s$'} ", ha='left', c='blue')
-axs[0][1].text(robot_data[robot_time][-1] - 0.6*robot_data[robot_time][-1], 3, f" {r'$v_r(y)$'} = {robot_data[robot_yvel][0]:.2f}{r'$m/s$'} ", ha='left', c='blue')
+axs[0][1].set_title("Gráfico da velocidade x e y\n do robô em função do tempo de interceptação",fontweight='bold')
 axs[0][1].minorticks_on()
 axs[0][1].grid(b=True, which="minor")
 
@@ -249,35 +261,32 @@ axs[0][1].grid(b=True, which="minor")
 #--------- Gráfico da posição x e y da bola --------
 #-------- em relação ao tempo de interceptação -----
 #===================================================
-axs[1][0].plot(time, x_pos, label=r'$x_b(x)$')
-axs[1][0].plot(time, y_pos, label=r'$y_b(y)$')
+axs[1][0].plot(time, x_pos, label=r'$x_b(x)$', color='r')
+axs[1][0].plot(time, y_pos, label=r'$y_b(y)$', color='g')
 
-axs[1][0].legend(loc="upper right", shadow=True, fontsize=12, bbox_to_anchor=(-0.05, 1.5))
+axs[1][0].legend(loc="upper right", shadow=True, fontsize=10, bbox_to_anchor=(-0.05, 1.5))
 #axs[1][0].set_xlim()
 #axs[1][0].set_ylim()
 axs[1][0].set_xlabel(r'$t[s]$')
 axs[1][0].set_ylabel(r'$s[m]$')
-axs[1][0].set_title("Gráfico da posição x e y\n da bola em função do tempo")
+axs[1][0].set_title("Gráfico da posição x e y\n da bola em função do tempo", fontweight='bold')
 axs[1][0].minorticks_on()
 axs[1][0].grid(b=True, which="minor")
 
 
 #====================================================
-#--------- Gráfico da velocidade x e y do robô ------
+#--------- Gráfico da velocidade x e y da bola ------
 #-------- em relação ao tempo de interceptação ------
 #====================================================
-axs[1][1].plot(time, ball_xvel, label=r'$v_b(x)$')
-axs[1][1].plot(time, ball_yvel, label=r'$v_b(y)$')
+axs[1][1].plot(time, ball_xvel, label=r'$v_b(x)$', color='r')
+axs[1][1].plot(time, ball_yvel, label=r'$v_b(y)$', color='g')
 
-axs[1][1].legend(loc="upper left", shadow=True, fontsize=12, bbox_to_anchor=(1.00, 1.5))
+axs[1][1].legend(loc="upper left", shadow=True, fontsize=10, bbox_to_anchor=(1.00, 1.5))
 axs[1][1].set_xlabel(r'$t[s]$')
 axs[1][1].set_ylabel(r'$s[m]$')
-axs[1][1].set_title("Gráfico da velocidade x\n da bola em função do tempo")
+axs[1][1].set_title("Gráfico da velocidade x e y\n da bola em função do tempo", fontweight='bold')
 axs[1][1].minorticks_on()
 axs[1][1].grid(b=True, which="minor")
-
-fig2.tight_layout()
-
 
 
 
@@ -286,17 +295,17 @@ fig3, ax3 = plt.subplots(nrows=2, ncols=1, sharex=True)
 #---------Gráfico das Componentes da aceleração x e y da bola --------
 #------------- em relação ao tempo de interceptação ------------------
 #=====================================================================
-ax3[0].plot(time, ball_xaccel, label=r'$a_x(t)$', color='blue', linewidth = 0.75)
-ax3[1].plot(time, ball_yaccel, label=r'$a_y(t)$', color='orange')
+ax3[0].plot(time, ball_xaccel, label=r'$a_x(t)$', color='r', linewidth = 0.75)
+ax3[1].plot(time, ball_yaccel, label=r'$a_y(t)$', color='g')
 
-ax3[0].legend(loc="upper left", shadow=True, fontsize=14, bbox_to_anchor=(1.00, 1))
+ax3[0].legend(loc="upper right", shadow=True, fontsize=14)
 ax3[0].set_ylabel(r'$a_x [m/s^2]$')
-ax3[0].set_title("Gráfico das componentes da aceleração\nda bola em função do tempo")
+ax3[0].set_title("Gráfico das componentes da aceleração\nda bola em função do tempo", fontsize=16,fontweight='bold')
 ax3[0].text(xo, yo + 0.25, "robot", ha='center')
 ax3[0].minorticks_on()
 ax3[0].grid(b=True, which="minor")
 
-ax3[1].legend(loc="upper left", shadow=True, fontsize=14, bbox_to_anchor=(1.00, 1))
+ax3[1].legend(loc="upper right", shadow=True, fontsize=14)
 ax3[1].set_xlabel(r'$t [s]$')
 ax3[1].set_ylabel(r'$a_y [m/s^2]$')
 ax3[1].text(xo, yo + 0.25, "robot", ha='center')

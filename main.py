@@ -104,6 +104,7 @@ def min_distance():
     global new_time
     global ballx_pos
     global bally_pos
+    global min_dist
 
     min_dist = relativeDist[0]
     for i in range(len(relativeDist)):
@@ -217,7 +218,7 @@ if robot_data[vel_absolute] > vmax_robot:
 ax.minorticks_on()
 ax.grid(b=True, which="minor")
 
-
+print(relativeDist)
 
 fig2, axs = plt.subplots(nrows=2, ncols=2, layout="constrained")
 #===================================================
@@ -228,12 +229,12 @@ axs[0][0].plot(robot_data[robot_time], robot_data[robot_xpos], label=r'$x_r(t)$'
 axs[0][0].plot(robot_data[robot_time], robot_data[robot_ypos], label=r'$y_r(t)$', color='c')
 
 axs[0][0].legend(loc="upper right", shadow=True, fontsize=10, bbox_to_anchor=(-0.05, 1.5))
-axs[0][0].set_xlim(0, robot_data[robot_time][-1] + 0.25)
-axs[0][0].set_ylim(0, 9)
+axs[0][0].set_xlim(0, robot_data[robot_time][-1] + 0.5)
+axs[0][0].set_ylim(0.0, 9.0)
 axs[0][0].set_xlabel(r'$t[s]$')
 axs[0][0].set_ylabel(r'$s[m]$')
-axs[0][0].xaxis.set_ticks(np.arange(0, 2, 0.25))
-axs[0][0].yaxis.set_ticks(np.arange(0, 9, 1.0))
+axs[0][1].xaxis.set_ticks(np.arange(0, robot_data[robot_time][-1], 0.25))
+axs[0][0].yaxis.set_ticks(np.arange(0, 9, 0.75))
 axs[0][0].set_title("Gráfico da posição x e y\n do robô em função do tempo de interceptação", fontweight='bold')
 axs[0][0].minorticks_on()
 axs[0][0].grid(b=True, which="minor")
@@ -246,10 +247,10 @@ axs[0][1].plot(robot_data[robot_time], robot_data[robot_xvel], label=f" {r'$v_r(
 axs[0][1].plot(robot_data[robot_time], robot_data[robot_yvel], label=f" {r'$v_r(y)$'} = {robot_data[robot_yvel][-1]:.2f}{r'$m/s$'}", color='c')
 
 axs[0][1].legend(loc="upper left", shadow=True, fontsize=10, bbox_to_anchor=(1.00, 1.5))
-axs[0][1].set_xlim(0, robot_data[robot_time][-1] + 0.25)
+axs[0][1].set_xlim(0, robot_data[robot_time][-1] + 0.5)
 axs[0][1].set_ylim(-4, 4)
 axs[0][1].set_xlabel(r'$t[s]$')
-axs[0][1].xaxis.set_ticks(np.arange(0, 2, 0.25))
+axs[0][1].xaxis.set_ticks(np.arange(0, robot_data[robot_time][-1], 0.25))
 axs[0][1].yaxis.set_ticks(np.arange(-4, 4, 0.75))
 axs[0][1].set_ylabel(r'$v[m/s]$')
 axs[0][1].set_title("Gráfico da velocidade x e y\n do robô em função do tempo de interceptação",fontweight='bold')
@@ -265,8 +266,6 @@ axs[1][0].plot(time, x_pos, label=r'$x_b(x)$', color='r')
 axs[1][0].plot(time, y_pos, label=r'$y_b(y)$', color='g')
 
 axs[1][0].legend(loc="upper right", shadow=True, fontsize=10, bbox_to_anchor=(-0.05, 1.5))
-#axs[1][0].set_xlim()
-#axs[1][0].set_ylim()
 axs[1][0].set_xlabel(r'$t[s]$')
 axs[1][0].set_ylabel(r'$s[m]$')
 axs[1][0].set_title("Gráfico da posição x e y\n da bola em função do tempo", fontweight='bold')
@@ -283,7 +282,7 @@ axs[1][1].plot(time, ball_yvel, label=r'$v_b(y)$', color='g')
 
 axs[1][1].legend(loc="upper left", shadow=True, fontsize=10, bbox_to_anchor=(1.00, 1.5))
 axs[1][1].set_xlabel(r'$t[s]$')
-axs[1][1].set_ylabel(r'$s[m]$')
+axs[1][1].set_ylabel(r'$v[m/s]$')
 axs[1][1].set_title("Gráfico da velocidade x e y\n da bola em função do tempo", fontweight='bold')
 axs[1][1].minorticks_on()
 axs[1][1].grid(b=True, which="minor")
@@ -311,6 +310,33 @@ ax3[1].set_ylabel(r'$a_y [m/s^2]$')
 ax3[1].text(xo, yo + 0.25, "robot", ha='center')
 ax3[1].minorticks_on()
 ax3[1].grid(b=True, which="minor")
+
+
+
+
+fig5, ax4 = plt.subplots(nrows=1, ncols=1)
+#=====================================================================
+#---------Gráfico da distancia relativa entre a bola e o robô --------
+#------------- em relação ao tempo de interceptação ------------------
+#=====================================================================
+ax4.plot(time, relativeDist, label=r'$D(m)$', color='r', linewidth = 0.95)
+ax4.plot(new_time, min_dist, color='none', linestyle = 'dashed', linewidth = 2,
+marker = 'o', markersize = 5, markerfacecolor = 'blue', markeredgecolor = 'blue')
+
+#ax4.axhline(y = min_dist, color = 'b', linestyle = '-')
+ax4.text(new_time, min_dist + 1.5, f"({new_time:.2f},{min_dist:.2f})", ha='center')
+
+ax4.legend(loc="upper right", shadow=True, fontsize=14)
+ax4.set_ylabel(r'$distancia[m]$')
+ax4.set_xlabel(r'$t[s]$')
+ax4.set_xlim(0, 20)
+ax4.set_ylim(0, 95)
+ax4.yaxis.set_ticks(np.arange(0, 95, 5))
+ax4.xaxis.set_ticks(np.arange(0, 20, 1))
+ax4.set_title("Gráfico da distânica relativa entre bola e robô \nem função do tempo", fontsize=16,fontweight='bold')
+ax4.minorticks_on()
+ax4.grid(b=True, which="minor")
+
 
 plt.show()
 

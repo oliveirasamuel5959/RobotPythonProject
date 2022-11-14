@@ -1,5 +1,3 @@
-
-
 #===================================================
 #----- Variaveis declaradas para a posição ---------
 #---- da lista de dados do robô nos gráficos -------
